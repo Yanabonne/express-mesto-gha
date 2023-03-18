@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 function omitV(doc, obj) {
   delete obj.__v;
@@ -19,14 +19,14 @@ const cardSchema = new mongoose.Schema(
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: 'user',
       required: true,
     },
     likes: {
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "user",
+          ref: 'user',
         },
       ],
       default: [],
@@ -40,7 +40,7 @@ const cardSchema = new mongoose.Schema(
     toJSON: {
       transform: omitV,
     },
-  }
+  },
 );
 
-module.exports = mongoose.model("card", cardSchema);
+module.exports = mongoose.model('card', cardSchema);

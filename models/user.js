@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 function omitV(doc, obj) {
   delete obj.__v;
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     toJSON: {
       transform: omitV,
     },
-  }
+  },
 );
 
-module.exports = mongoose.model("user", userSchema);
+module.exports = mongoose.model('user', userSchema);
