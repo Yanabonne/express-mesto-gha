@@ -6,7 +6,7 @@ function sendError(err, res) {
       .status(400)
       .send({ message: 'Переданы некорректные данные пользователя' });
   }
-  if (err.name === 'NotFound') {
+  if (err.name === 'NotFound' || err.name === 'CastError') {
     return res.status(404).send({ message: 'Пользователь не найден' });
   }
   return res.status(500).send({ message: 'Неизвестная ошибка' });
@@ -36,7 +36,15 @@ module.exports.updateUserInfo = (req, res) => {
   const { name, about } = req.body;
   const userId = req.user._id;
 
-  User.findByIdAndUpdate(userId, { name, about })
+  User.findByIdAndUpdate(
+    userId,
+    { name, about },
+    {
+      new: true,
+      runValidators: true,
+      upsert: true,
+    },
+  )
     .then((user) => res.send({ data: user }))
     .catch((err) => sendError(err, res));
 };
@@ -45,7 +53,15 @@ module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
   const userId = req.user._id;
 
-  User.findByIdAndUpdate(userId, { avatar })
+  User.findByIdAndUpdate(
+    userId,
+    { avatar },
+    {
+      new: true,
+      runValidators: true,
+      upsert: true,
+    },
+  )
     .then((user) => res.send({ data: user }))
     .catch((err) => sendError(err, res));
 };
