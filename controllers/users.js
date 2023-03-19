@@ -1,12 +1,12 @@
 const User = require('../models/user');
 
 function sendError(err, res) {
-  if (err.name === 'ValidationError') {
+  if (err.name === 'ValidationError' || err.name === 'CastError') {
     return res
       .status(400)
       .send({ message: 'Переданы некорректные данные пользователя' });
   }
-  if (err.name === 'NotFound' || err.name === 'CastError') {
+  if (err.name === 'NotFound') {
     return res.status(404).send({ message: 'Пользователь не найден' });
   }
   return res.status(500).send({ message: 'Неизвестная ошибка' });
@@ -20,7 +20,12 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (user === null) {
+        res.status(404).send({ message: 'Пользователь не найден' });
+      }
+      res.send({ data: user });
+    })
     .catch((err) => sendError(err, res));
 };
 

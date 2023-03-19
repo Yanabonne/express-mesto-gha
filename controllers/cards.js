@@ -1,12 +1,12 @@
 const Card = require('../models/card');
 
 function sendError(err, res) {
-  if (err.name === 'ValidationError') {
+  if (err.name === 'ValidationError' || err.name === 'CastError') {
     return res
       .status(400)
       .send({ message: 'Переданы некорректные данные карточки' });
   }
-  if (err.name === 'NotFound' || err.name === 'CastError') {
+  if (err.name === 'NotFound') {
     return res.status(404).send({ message: 'Карточка не найдена' });
   }
   return res.status(500).send({ message: 'Неизвестная ошибка' });
