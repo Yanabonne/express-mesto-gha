@@ -1,16 +1,15 @@
 const Card = require('../models/card');
 
 function sendError(err, res) {
-  return res.send(err.name);
-  // if (err.name === 'ValidationError') {
-  //   return res
-  //     .status(400)
-  //     .send({ message: 'Переданы некорректные данные карточки' });
-  // }
-  // if (err.name === 'NotFound' || err.name === 'CastError') {
-  //   return res.status(404).send({ message: 'Карточка не найдена' });
-  // }
-  // return res.status(500).send({ message: 'Неизвестная ошибка' });
+  if (err.name === 'ValidationError') {
+    return res
+      .status(400)
+      .send({ message: 'Переданы некорректные данные карточки' });
+  }
+  if (err.name === 'NotFound' || err.name === 'CastError') {
+    return res.status(404).send({ message: 'Карточка не найдена' });
+  }
+  return res.status(500).send({ message: 'Неизвестная ошибка' });
 }
 
 module.exports.getCards = (req, res) => {
