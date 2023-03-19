@@ -30,7 +30,12 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card === null) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+      }
+      res.send({ data: card });
+    })
     .catch((err) => sendError(err, res));
 };
 
@@ -40,7 +45,12 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card === null) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+      }
+      res.send({ data: card });
+    })
     .catch((err) => sendError(err, res));
 };
 
@@ -50,6 +60,11 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card === null) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+      }
+      res.send({ data: card });
+    })
     .catch((err) => sendError(err, res));
 };
