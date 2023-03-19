@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 function showWrongPathError(req, res) {
-  return res.status(500).send({ message: 'Неизвестная ошибка' });
+  return res.status(404).send({ message: 'Страница не найдена' });
 }
 
 router.get('/', showWrongPathError);
