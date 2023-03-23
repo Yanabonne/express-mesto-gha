@@ -24,6 +24,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-react": "^7.32.2",
+    "mongoose-type-url": "^2.1.0",
     "nodemon": "^2.0.21"
   },
   "dependencies": {

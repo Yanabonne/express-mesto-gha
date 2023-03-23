@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+require('mongoose-type-url');
 
 function omitV(doc, obj) {
   delete obj.__v;
@@ -14,7 +15,7 @@ const cardSchema = new mongoose.Schema(
       required: true,
     },
     link: {
-      type: String,
+      type: mongoose.SchemaTypes.Url,
       required: true,
     },
     owner: {
