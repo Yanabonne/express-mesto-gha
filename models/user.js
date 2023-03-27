@@ -1,3 +1,4 @@
+const { isEmail } = require('validator');
 const mongoose = require('mongoose');
 
 function omitV(doc, obj) {
@@ -22,6 +23,20 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: isEmail,
+        isAsync: false,
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 8,
     },
   },
   {
