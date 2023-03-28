@@ -1,5 +1,4 @@
 const User = require('../models/user');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const { JWT_SECRET } = process.env;
@@ -23,7 +22,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId)
+  User.findById(req.user._id)
     .then((user) => {
       if (user === null) {
         res.status(404).send({ message: 'Пользователь не найден' });
