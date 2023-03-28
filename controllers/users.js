@@ -119,7 +119,7 @@ module.exports.login = (req, res, next) => {
           httpOnly: true,
         })
         .end();
+      res.send({ data: user });
     })
-    .then((user) => res.send({ data: user }))
     .catch((err) => sendError(err, next));
 };

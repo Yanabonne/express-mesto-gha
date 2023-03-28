@@ -7,16 +7,8 @@ const handleAuthError = () => {
   throw new IncorrectDataError('Необходима авторизация');
 };
 
-const extractBearerToken = (header) => header.replace('Bearer ', '');
-
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers;
-
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return handleAuthError();
-  }
-
-  const token = extractBearerToken(authorization);
+  const token = req.cookies.jwt;
   let payload;
 
   try {
