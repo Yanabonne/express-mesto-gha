@@ -30,7 +30,7 @@ module.exports.getCards = (req, res, next) => {
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  const owner = req.body._id;
+  const owner = req.user._id;
 
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
@@ -43,7 +43,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (card === null) {
         throw new NotFoundError('Карточка не найдена');
       }
-      if (card.owner !== req.body._id) {
+      if (card.owner !== req.user._id) {
         throw new IncorrectDataError('Вы не можете удалить чужую карточку');
       }
       res.send({ data: card });
