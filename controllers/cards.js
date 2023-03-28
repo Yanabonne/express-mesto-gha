@@ -4,6 +4,7 @@ const ValidationError = require('../errors/validation-err');
 const NotFoundError = require('../errors/not-found-err');
 const ServerError = require('../errors/server-err');
 const IncorrectDataError = require('../errors/incorrect-data-err');
+const NoRightsError = require('../errors/no-rights-err');
 
 function sendError(err, next) {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
@@ -43,8 +44,8 @@ module.exports.deleteCard = (req, res, next) => {
       if (card === null) {
         throw new NotFoundError('Карточка не найдена');
       }
-      if (card.owner !== req.user._id) {
-        throw new IncorrectDataError('Вы не можете удалить чужую карточку');
+      if (card.owner.toHexString() !== req.user._id) {
+        throw new NoRightsError('Вы не можете удалить чужую карточку');
       }
       res.send({ data: card });
     })
