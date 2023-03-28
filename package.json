@@ -38,6 +38,7 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.2",
     "mongoose-type-url": "^2.1.0",
+    "simple-git": "^3.17.0",
     "validator": "^13.9.0"
   }
 }
