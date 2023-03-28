@@ -5,6 +5,7 @@ const ValidationError = require('../errors/validation-err');
 const NotFoundError = require('../errors/not-found-err');
 const ServerError = require('../errors/server-err');
 const IncorrectDataError = require('../errors/incorrect-data-err');
+const DuplicationError = require('../errors/duplication-err');
 
 const JWT_SECRET = 'cdc42cb1da7509ed6100b46348a3444b52fa1e611d2888a33a629ea84b7bfde9';
 
@@ -17,6 +18,9 @@ function sendError(err, next) {
   }
   if (err.name === 'TypeError') {
     next(new IncorrectDataError('Переданы неверные данные'));
+  }
+  if (err.code === 11000) {
+    next(new DuplicationError('Пользователь с такими данными уже существует'));
   }
   if (err.name === 'InternalServerError') {
     next(new ServerError('На сервере произошла ошибка'));
@@ -50,7 +54,13 @@ module.exports.createUser = (req, res, next) => {
     name, about, avatar, email, password,
   })
     .then((user) => {
-      res.send({ data: user });
+      const data = {
+        email: user.email,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      };
+      res.send({ data });
     })
     .catch((err) => sendError(err, next));
 };
@@ -68,7 +78,15 @@ module.exports.updateUserInfo = (req, res, next) => {
       upsert: true,
     },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      const data = {
+        email: user.email,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      };
+      res.send({ data });
+    })
     .catch((err) => sendError(err, next));
 };
 
@@ -92,7 +110,7 @@ module.exports.updateAvatar = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email } = req.body;
 
-  return User.findOne({ email }).select('+password')
+  User.findOne({ email }).select('+password')
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res
@@ -102,5 +120,6 @@ module.exports.login = (req, res, next) => {
         })
         .end();
     })
+    .then((user) => res.send({ data: user }))
     .catch((err) => sendError(err, next));
 };
