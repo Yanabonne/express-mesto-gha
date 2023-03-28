@@ -1,5 +1,5 @@
-const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 const { JWT_SECRET } = process.env;
 
@@ -22,7 +22,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.body._id)
+  User.findById(req.user._id)
     .then((user) => {
       if (user === null) {
         res.status(404).send({ message: 'Пользователь не найден' });
@@ -47,8 +47,8 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.updateUserInfo = (req, res) => {
-  const { name, about, _id } = req.body;
-  const userId = _id;
+  const { name, about } = req.body;
+  const userId = req.user._id;
 
   User.findByIdAndUpdate(
     userId,
@@ -64,8 +64,8 @@ module.exports.updateUserInfo = (req, res) => {
 };
 
 module.exports.updateAvatar = (req, res) => {
-  const { avatar, _id } = req.body;
-  const userId = _id;
+  const { avatar } = req.body;
+  const userId = req.user._id;
 
   User.findByIdAndUpdate(
     userId,
@@ -81,9 +81,9 @@ module.exports.updateAvatar = (req, res) => {
 };
 
 module.exports.login = (req, res) => {
-  const { email, password } = req.body;
+  const { email } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  return User.findOne({ email }).select('+password')
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res

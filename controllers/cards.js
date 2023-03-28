@@ -21,7 +21,7 @@ module.exports.getCards = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
+  const owner = req.body._id;
 
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
@@ -33,6 +33,9 @@ module.exports.deleteCard = (req, res) => {
     .then((card) => {
       if (card === null) {
         res.status(404).send({ message: 'Карточка не найдена' });
+      }
+      if (card.owner !== req.body._id) {
+        res.status(401).send({ message: 'Вы не можете удалить чужую карточку' });
       }
       res.send({ data: card });
     })

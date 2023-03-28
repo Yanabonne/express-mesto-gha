@@ -22,7 +22,7 @@ mongoose.connect('mongodb://0.0.0.0:27017/mestodb', {
 });
 
 app.use('/users', auth, require('./routes/users'));
-app.use('/cards', auth, require('./routes/cards'));
+app.use('/cards', require('./routes/cards'));
 
 app.post('/signin', login);
 app.post('/signup', createUser);
