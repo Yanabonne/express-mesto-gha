@@ -29,12 +29,20 @@ app.use('/cards', auth, require('./routes/cards'));
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.use('*', (req, res) => {
+app.use('*', (req, res, next) => {
   next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
 
 app.use((err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message });
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
 });
 
 app.listen(PORT);

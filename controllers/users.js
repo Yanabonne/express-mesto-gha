@@ -8,7 +8,7 @@ const IncorrectDataError = require('../errors/incorrect-data-err');
 
 const JWT_SECRET = 'cdc42cb1da7509ed6100b46348a3444b52fa1e611d2888a33a629ea84b7bfde9';
 
-function sendError(err) {
+function sendError(err, next) {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
     next(new ValidationError('Переданы некорректные данные пользователя'));
   }
@@ -24,13 +24,13 @@ function sendError(err) {
   next(err);
 }
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => sendError(err));
+    .catch((err) => sendError(err, next));
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (user === null) {
@@ -38,10 +38,10 @@ module.exports.getUser = (req, res) => {
       }
       res.send({ data: user });
     })
-    .catch((err) => sendError(err));
+    .catch((err) => sendError(err, next));
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -52,10 +52,10 @@ module.exports.createUser = (req, res) => {
     .then((user) => {
       res.send({ data: user });
     })
-    .catch((err) => sendError(err));
+    .catch((err) => sendError(err, next));
 };
 
-module.exports.updateUserInfo = (req, res) => {
+module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   const userId = req.user._id;
 
@@ -69,10 +69,10 @@ module.exports.updateUserInfo = (req, res) => {
     },
   )
     .then((user) => res.send({ data: user }))
-    .catch((err) => sendError(err));
+    .catch((err) => sendError(err, next));
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const userId = req.user._id;
 
@@ -86,10 +86,10 @@ module.exports.updateAvatar = (req, res) => {
     },
   )
     .then((user) => res.send({ data: user }))
-    .catch((err) => sendError(err));
+    .catch((err) => sendError(err, next));
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email } = req.body;
 
   return User.findOne({ email }).select('+password')
@@ -102,5 +102,5 @@ module.exports.login = (req, res) => {
         })
         .end();
     })
-    .catch((err) => sendError(err));
+    .catch((err) => sendError(err, next));
 };
