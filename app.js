@@ -4,6 +4,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
+const NotFoundError = require('./errors/not-found-err');
+
 const {
   createUser,
   login,
@@ -22,13 +24,17 @@ mongoose.connect('mongodb://0.0.0.0:27017/mestodb', {
 });
 
 app.use('/users', auth, require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+app.use('/cards', auth, require('./routes/cards'));
 
 app.post('/signin', login);
 app.post('/signup', createUser);
 
 app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+  next(new NotFoundError('Запрашиваемый ресурс не найден'));
+});
+
+app.use((err, req, res, next) => {
+  res.status(err.statusCode).send({ message: err.message });
 });
 
 app.listen(PORT);

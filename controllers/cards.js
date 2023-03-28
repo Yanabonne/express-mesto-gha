@@ -1,15 +1,24 @@
 const Card = require('../models/card');
 
+const ValidationError = require('../errors/validation-err');
+const NotFoundError = require('../errors/not-found-err');
+const ServerError = require('../errors/server-err');
+const IncorrectDataError = require('../errors/incorrect-data-err');
+
 function sendError(err, res) {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
-    return res
-      .status(400)
-      .send({ message: 'Переданы некорректные данные карточки' });
+    next(new ValidationError('Переданы некорректные данные карточки'));
   }
   if (err.name === 'NotFound') {
-    return res.status(404).send({ message: 'Карточка не найдена' });
+    next(new NotFoundError('Карточка не найдена'));
   }
-  return res.status(500).send({ message: 'На сервере произошла ошибка' });
+  if (err.name === 'TypeError') {
+    next(new IncorrectDataError('Переданы неверные данные'));
+  }
+  if (err.name === 'InternalServerError') {
+    next(new ServerError('На сервере произошла ошибка'));
+  }
+  next(err);
 }
 
 module.exports.getCards = (req, res) => {
@@ -32,10 +41,10 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (card === null) {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        throw new NotFoundError('Карточка не найдена');
       }
       if (card.owner !== req.body._id) {
-        res.status(401).send({ message: 'Вы не можете удалить чужую карточку' });
+        throw new IncorrectDataError('Вы не можете удалить чужую карточку');
       }
       res.send({ data: card });
     })
@@ -50,7 +59,7 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (card === null) {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        throw new NotFoundError('Карточка не найдена');
       }
       res.send({ data: card });
     })
@@ -65,7 +74,7 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (card === null) {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        throw new NotFoundError('Карточка не найдена');
       }
       res.send({ data: card });
     })
