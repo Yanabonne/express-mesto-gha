@@ -1,6 +1,7 @@
 const { isEmail } = require('validator');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+require('mongoose-type-url');
 
 function omitV(doc, obj) {
   delete obj.__v;
@@ -22,7 +23,7 @@ const userSchema = new mongoose.Schema(
       default: 'Исследователь',
     },
     avatar: {
-      type: String,
+      type: mongoose.SchemaTypes.Url,
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     },
     email: {

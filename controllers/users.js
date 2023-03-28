@@ -22,7 +22,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.user._id)
+  User.findById(req.body._id)
     .then((user) => {
       if (user === null) {
         res.status(404).send({ message: 'Пользователь не найден' });
@@ -47,8 +47,8 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.updateUserInfo = (req, res) => {
-  const { name, about } = req.body;
-  const userId = req.user._id;
+  const { name, about, _id } = req.body;
+  const userId = _id;
 
   User.findByIdAndUpdate(
     userId,
@@ -64,8 +64,8 @@ module.exports.updateUserInfo = (req, res) => {
 };
 
 module.exports.updateAvatar = (req, res) => {
-  const { avatar } = req.body;
-  const userId = req.user._id;
+  const { avatar, _id } = req.body;
+  const userId = _id;
 
   User.findByIdAndUpdate(
     userId,
