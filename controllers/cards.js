@@ -5,7 +5,7 @@ const NotFoundError = require('../errors/not-found-err');
 const ServerError = require('../errors/server-err');
 const IncorrectDataError = require('../errors/incorrect-data-err');
 
-function sendError(err, res, next) {
+function sendError(err, next) {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
     next(new ValidationError('Переданы некорректные данные карточки'));
   }
