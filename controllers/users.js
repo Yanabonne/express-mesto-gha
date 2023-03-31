@@ -108,7 +108,6 @@ module.exports.updateAvatar = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => res.send({ data: user }))
