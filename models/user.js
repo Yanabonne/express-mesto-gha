@@ -1,4 +1,4 @@
-const { isEmail } = require('validator');
+const { isEmail, isURL } = require('validator');
 const mongoose = require('mongoose');
 require('mongoose-type-url');
 
@@ -22,8 +22,12 @@ const userSchema = new mongoose.Schema(
       default: 'Исследователь',
     },
     avatar: {
-      type: mongoose.SchemaTypes.Url,
+      type: String,
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+      validate: {
+        validator: isURL,
+        isAsync: false,
+      },
     },
     email: {
       type: String,
