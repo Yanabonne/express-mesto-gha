@@ -9,17 +9,15 @@ const NoRightsError = require('../errors/no-rights-err');
 function sendError(err, next) {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
     next(new ValidationError('Переданы некорректные данные карточки'));
-  }
-  if (err.name === 'NotFound') {
+  } else if (err.name === 'NotFound') {
     next(new NotFoundError('Карточка не найдена'));
-  }
-  if (err.name === 'TypeError') {
+  } else if (err.name === 'TypeError') {
     next(new IncorrectDataError('Переданы неверные данные'));
-  }
-  if (err.name === 'InternalServerError') {
+  } else if (err.name === 'InternalServerError') {
     next(new ServerError('На сервере произошла ошибка'));
+  } else {
+    next(err);
   }
-  next(err);
 }
 
 module.exports.getCards = (req, res, next) => {

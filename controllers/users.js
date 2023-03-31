@@ -12,20 +12,17 @@ const JWT_SECRET = 'cdc42cb1da7509ed6100b46348a3444b52fa1e611d2888a33a629ea84b7b
 function sendError(err, next) {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
     next(new ValidationError('Переданы некорректные данные пользователя'));
-  }
-  if (err.name === 'NotFound') {
+  } else if (err.name === 'NotFound') {
     next(new NotFoundError('Пользователь не найден'));
-  }
-  if (err.name === 'TypeError') {
+  } else if (err.name === 'TypeError') {
     next(new IncorrectDataError('Переданы неверные данные'));
-  }
-  if (err.code === 11000) {
+  } else if (err.code === 11000) {
     next(new DuplicationError('Пользователь с такими данными уже существует'));
-  }
-  if (err.name === 'InternalServerError') {
+  } else if (err.name === 'InternalServerError') {
     next(new ServerError('На сервере произошла ошибка'));
+  } else {
+    next(err);
   }
-  next(err);
 }
 
 module.exports.getUsers = (req, res, next) => {
@@ -86,7 +83,6 @@ module.exports.updateUserInfo = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => {
@@ -133,3 +129,28 @@ module.exports.login = (req, res, next) => {
     })
     .catch((err) => sendError(err, next));
 };
+
+// module.exports.login = (req, res, next) => {
+//   const { email, password } = req.body;
+
+//   User.findOne({ email }).select('+password')
+//     .then((user) => {
+//       if (!user) {
+//         throw new IncorrectDataError('Неверные почта или пароль');
+//       }
+//       return bcrypt.compare(password, user.password)
+//         .then((matched) => {
+//           if (!matched) {
+//             throw new IncorrectDataError('Неверные почта или пароль');
+//           }
+//           const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+//           res
+//             .cookie('jwt', token, {
+//               maxAge: 3600000 * 24 * 7,
+//               httpOnly: true,
+//             });
+//           res.send({ data: user });
+//         });
+//     })
+//     .catch((err) => sendError(err, next));
+// };
