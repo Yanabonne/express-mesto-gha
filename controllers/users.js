@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 const ValidationError = require('../errors/validation-err');
 const NotFoundError = require('../errors/not-found-err');
-const ServerError = require('../errors/server-err');
 const IncorrectDataError = require('../errors/incorrect-data-err');
 const DuplicationError = require('../errors/duplication-err');
 
@@ -14,12 +14,8 @@ function sendError(err, next) {
     next(new ValidationError('Переданы некорректные данные пользователя'));
   } else if (err.name === 'NotFound') {
     next(new NotFoundError('Пользователь не найден'));
-  } else if (err.name === 'TypeError') {
-    next(new IncorrectDataError('Переданы неверные данные'));
   } else if (err.code === 11000) {
     next(new DuplicationError('Пользователь с такими данными уже существует'));
-  } else if (err.name === 'InternalServerError') {
-    next(new ServerError('На сервере произошла ошибка'));
   } else {
     next(err);
   }
@@ -115,42 +111,26 @@ module.exports.updateAvatar = (req, res, next) => {
 };
 
 module.exports.login = (req, res, next) => {
-  const { email } = req.body;
+  const { email, password } = req.body;
 
   User.findOne({ email }).select('+password')
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
-      res
-        .cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
+      if (!user) {
+        throw new IncorrectDataError('Неверные почта или пароль');
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            throw new IncorrectDataError('Неверные почта или пароль');
+          }
+          const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+          res
+            .cookie('jwt', token, {
+              maxAge: 3600000 * 24 * 7,
+              httpOnly: true,
+            });
+          res.send({ data: user });
         });
-      res.send({ data: user });
     })
     .catch((err) => sendError(err, next));
 };
-
-// module.exports.login = (req, res, next) => {
-//   const { email, password } = req.body;
-
-//   User.findOne({ email }).select('+password')
-//     .then((user) => {
-//       if (!user) {
-//         throw new IncorrectDataError('Неверные почта или пароль');
-//       }
-//       return bcrypt.compare(password, user.password)
-//         .then((matched) => {
-//           if (!matched) {
-//             throw new IncorrectDataError('Неверные почта или пароль');
-//           }
-//           const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
-//           res
-//             .cookie('jwt', token, {
-//               maxAge: 3600000 * 24 * 7,
-//               httpOnly: true,
-//             });
-//           res.send({ data: user });
-//         });
-//     })
-//     .catch((err) => sendError(err, next));
-// };
