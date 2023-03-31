@@ -12,26 +12,26 @@ router.get('/', getCards);
 
 router.delete('/:cardId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().length(24).hex().required(),
   }),
 }), deleteCard);
 
 router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(/^http[s]?:\/\/[a-zA-Z0-9-._~:/?#[@!$&'()*+,;\]=]+$/),
+    link: Joi.string().required().pattern(/^http[s]?:\/\/[a-zA-Z0-9-._~:/?#[@!$&'()*+,;\]=]+\.[a-zA-Z0-9-._~:/?#[@!$&'()*+,;\]=]+$/),
   }),
 }), createCard);
 
 router.put('/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().length(24).hex().required(),
   }),
 }), likeCard);
 
 router.delete('/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().length(24).hex().required(),
   }),
 }), dislikeCard);
 
