@@ -2,7 +2,6 @@ const Card = require('../models/card');
 
 const ValidationError = require('../errors/validation-err');
 const NotFoundError = require('../errors/not-found-err');
-const IncorrectDataError = require('../errors/incorrect-data-err');
 const NoRightsError = require('../errors/no-rights-err');
 
 function sendError(err, next) {
@@ -10,8 +9,6 @@ function sendError(err, next) {
     next(new ValidationError('Переданы некорректные данные карточки'));
   } else if (err.name === 'NotFound') {
     next(new NotFoundError('Карточка не найдена'));
-  } else if (err.name === 'TypeError') {
-    next(new IncorrectDataError('Переданы неверные данные'));
   } else {
     next(err);
   }
